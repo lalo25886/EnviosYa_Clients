@@ -1,14 +1,11 @@
 package com.enviosya.persistence.client;
 
 import java.io.Serializable;
-//import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-//import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-//import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -47,9 +44,6 @@ public class ClientEntity implements Serializable {
    @NotNull
    @Column(length = 300)
    private String claveTarjeta;
-
-//   @OneToMany(fetch = FetchType.EAGER, mappedBy = "emisor")
-//   private List<EnvioEntity> listaEnvios;
 
    public Long getId() {
        return this.id;
