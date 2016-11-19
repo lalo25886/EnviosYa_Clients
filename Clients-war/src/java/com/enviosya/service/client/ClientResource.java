@@ -22,7 +22,7 @@ import javax.ws.rs.core.UriInfo;
 @Path("client")
 public class ClientResource {
     
- @EJB
+    @EJB
     private ClientBean clientBean;
     
     @Context
@@ -31,7 +31,8 @@ public class ClientResource {
     public ClientResource() {
     }
 
-    @GET
+     @GET
+    @Path("getJson")
     @Produces(MediaType.APPLICATION_JSON)
     public String getJson() {
         List<ClientEntity> list = clientBean.listar();
@@ -40,6 +41,7 @@ public class ClientResource {
     }
 
     @POST
+    @Path("agregarCliente")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response agregar(String body) {
         Gson gson = new Gson();
@@ -49,7 +51,7 @@ public class ClientResource {
         if (creado == null) {
             r = Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity("AgregarClient")
+                    .entity("Cliente")
                     .build();
         } else {
             r = Response
@@ -58,7 +60,56 @@ public class ClientResource {
                     .build();
         }
         return r;
-    } 
-    
-}
+    }
+    @POST
+    @Path("modificarCliente")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response modificar(String body) {
+        Gson gson = new Gson();
+        ClientEntity u = gson.fromJson(body, ClientEntity.class);
+        Response r;
+        ClientEntity modificado = clientBean.modificar(u);
+        if (modificado == null) {
+            r = Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity("Cliente")
+                    .build();
+        } else {
+            r = Response
+                    .status(Response.Status.CREATED)
+                    .entity(gson.toJson(modificado))
+                    .build();
+        }
+        return r;
+    }
+     @POST
+    @Path("eliminarCliente")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response eliminar(String body) {
+        Gson gson = new Gson();
+        ClientEntity u = gson.fromJson(body, ClientEntity.class);
+        Response r;
+        Boolean modificado = clientBean.eliminar(u);
+        if (!modificado) {
+            r = Response
+                    .status(Response.Status.BAD_REQUEST)
+                    .entity("afadfadf")
+                    .build();
+        } else {
+            r = Response
+                    .status(Response.Status.CREATED)
+                    .entity(gson.toJson(modificado))
+                    .build();
+        }
+        return r;
+    }
 
+   @GET
+   @Path("getClientesEnvios")
+   @Consumes(MediaType.APPLICATION_JSON)
+   public String  getClientesEnvios() {
+       Gson gson = new Gson();
+       List<ClientEntity> list = clientBean.listarClientesEnvios();
+       return gson.toJson(list);
+   }
+}
