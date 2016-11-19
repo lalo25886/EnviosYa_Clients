@@ -41,7 +41,7 @@ public class ClientResource {
     }
 
     @POST
-    @Path("agregarCliente")
+    @Path("addClient")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response agregar(String body) {
         Gson gson = new Gson();
@@ -62,7 +62,7 @@ public class ClientResource {
         return r;
     }
     @POST
-    @Path("modificarCliente")
+    @Path("updateClient")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response modificar(String body) {
         Gson gson = new Gson();
@@ -83,7 +83,7 @@ public class ClientResource {
         return r;
     }
      @POST
-    @Path("eliminarCliente")
+    @Path("deleteClient")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response eliminar(String body) {
         Gson gson = new Gson();
