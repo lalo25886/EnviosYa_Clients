@@ -2,6 +2,7 @@ package com.enviosya.service.client;
 
 import com.enviosya.domain.client.ClientBean;
 import com.enviosya.persistence.client.ClientEntity;
+import com.enviosya.tool.client.Tool;
 import com.google.gson.Gson;
 import java.util.List;
 import javax.ejb.EJB;
@@ -41,17 +42,22 @@ public class ClientResource {
     }
 
     @POST
-    @Path("addClient")
+    @Path("add")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response agregar(String body) {
         Gson gson = new Gson();
         ClientEntity u = gson.fromJson(body, ClientEntity.class);
+        Tool t = new Tool();
+        String tarjetaEncriptada = t.Encriptar(u.getNumeroTarjeta());
+        u.setNumeroTarjeta(tarjetaEncriptada);
+        String claveEncriptada = t.Encriptar(u.getClaveTarjeta());
+        u.setClaveTarjeta(claveEncriptada);
         Response r;
         ClientEntity creado = clientBean.agregar(u);
         if (creado == null) {
             r = Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity("Cliente")
+                    .entity("Client")
                     .build();
         } else {
             r = Response
@@ -62,7 +68,7 @@ public class ClientResource {
         return r;
     }
     @POST
-    @Path("updateClient")
+    @Path("update")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response modificar(String body) {
         Gson gson = new Gson();
@@ -72,7 +78,7 @@ public class ClientResource {
         if (modificado == null) {
             r = Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity("Cliente")
+                    .entity("Client")
                     .build();
         } else {
             r = Response
@@ -83,7 +89,7 @@ public class ClientResource {
         return r;
     }
      @POST
-    @Path("deleteClient")
+    @Path("delete")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response eliminar(String body) {
         Gson gson = new Gson();
@@ -93,7 +99,7 @@ public class ClientResource {
         if (!modificado) {
             r = Response
                     .status(Response.Status.BAD_REQUEST)
-                    .entity("afadfadf")
+                    .entity("Client")
                     .build();
         } else {
             r = Response

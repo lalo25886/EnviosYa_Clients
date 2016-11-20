@@ -20,7 +20,8 @@ import org.apache.commons.codec.binary.Base64;
 public class Tool {
     
     private static String secretKey = "EnviosYa";//"qualityinfosolutions";
-    public static String Encriptar(String texto) {
+    
+    public String Encriptar(String texto) {
  
          //llave para encriptar datos
         String base64EncryptedString = "";
@@ -45,7 +46,7 @@ public class Tool {
         }
         return base64EncryptedString;
 }
-    public static String Desencriptar(String textoEncriptado) throws Exception {
+    public String Desencriptar(String textoEncriptado) throws Exception {
  
         //String secretKey = "qualityinfosolutions"; //llave para desenciptar datos
         String base64EncryptedString = "";
