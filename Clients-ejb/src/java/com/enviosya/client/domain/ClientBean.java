@@ -1,6 +1,6 @@
-package com.enviosya.domain.client;
+package com.enviosya.client.domain;
 
-import com.enviosya.persistence.client.ClientEntity;
+import com.enviosya.client.persistence.ClientEntity;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.Stateless;

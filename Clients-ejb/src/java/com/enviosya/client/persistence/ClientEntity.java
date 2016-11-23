@@ -1,4 +1,4 @@
-package com.enviosya.persistence.client;
+package com.enviosya.client.persistence;
 
 import java.io.Serializable;
 import javax.persistence.Column;

@@ -28,8 +28,7 @@ public class ApplicationConfig extends Application {
      * If required, comment out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
-        resources.add(com.enviosya.service.client.ClientResource.class);
-        //resources.add(servicios.service.ClienteResource.class);
+        resources.add(com.enviosya.client.service.ClientResource.class);
         //resources.add(servicios.service.VehiculoResource.class);
     }
     

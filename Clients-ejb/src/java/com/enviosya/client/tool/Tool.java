@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.enviosya.tool.client;
+package com.enviosya.client.tool;
 
 import java.security.MessageDigest;
 import java.util.Arrays;
@@ -69,7 +69,5 @@ public class Tool {
             //Acá tengo que agregar el retorno de la exception
         }
         return base64EncryptedString;
-}
-    
-    
+    }   
 }

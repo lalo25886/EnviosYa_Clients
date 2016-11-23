@@ -1,8 +1,8 @@
-package com.enviosya.service.client;
+package com.enviosya.client.service;
 
-import com.enviosya.domain.client.ClientBean;
-import com.enviosya.persistence.client.ClientEntity;
-import com.enviosya.tool.client.Tool;
+import com.enviosya.client.domain.ClientBean;
+import com.enviosya.client.persistence.ClientEntity;
+import com.enviosya.client.tool.Tool;
 import com.google.gson.Gson;
 import java.util.List;
 import javax.ejb.EJB;
