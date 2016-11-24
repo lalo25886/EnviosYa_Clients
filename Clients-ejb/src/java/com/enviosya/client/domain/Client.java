@@ -74,6 +74,13 @@ public class Client {
         this.claveTarjeta = claveTarjeta;
     }
 
+    @Override
+    public String toString() {
+        return "Client{" + "ID=" + id + ", "
+                + "Nombre=" + nombre + ", "
+                + "Apellido=" + apellido + '}';
+    }
+
     
 }
 
