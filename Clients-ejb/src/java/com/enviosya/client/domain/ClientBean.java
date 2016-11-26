@@ -86,8 +86,13 @@ public class ClientBean {
        return listaClientes;
    }
     public String obtenerMail(Long id) {
-        ClientEntity unClientEntity = em.find(ClientEntity.class, id);
-        return unClientEntity.getEmail();
+        ClientEntity unClientEntity =
+                em.find(ClientEntity.class, id);
+        String retorno = "";
+        if (unClientEntity != null) {
+            retorno = unClientEntity.getEmail();
+        }
+        return retorno;
     }
 
 }
