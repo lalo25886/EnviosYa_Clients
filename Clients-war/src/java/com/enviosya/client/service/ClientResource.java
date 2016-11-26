@@ -10,6 +10,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -110,12 +111,22 @@ public class ClientResource {
         return r;
     }
 
-   @GET
-   @Path("getClientesEnvios")
-   @Consumes(MediaType.APPLICATION_JSON)
-   public String  getClientesEnvios() {
+    @GET
+    @Path("getClientesEnvios")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public String  getClientesEnvios() {
        Gson gson = new Gson();
        List<ClientEntity> list = clientBean.listarClientesEnvios();
        return gson.toJson(list);
-   }
+    }
+
+    @GET
+    @Path("getClient/{id}")
+    @Consumes(MediaType.TEXT_HTML)
+    public String getClienteNotificar(@PathParam("id") String id) {
+        ClientEntity unClient = new ClientEntity();
+        unClient.setId(Long.parseLong(id));
+        String retorno = clientBean.obtenerMail(unClient.getId());
+        return retorno;
+    }
 }
