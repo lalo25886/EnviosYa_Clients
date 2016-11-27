@@ -1,6 +1,8 @@
 package com.enviosya.client.service;
 
 import com.enviosya.client.domain.ClientBean;
+import com.enviosya.client.exception.DatoErroneoException;
+import com.enviosya.client.exception.EntidadNoExisteException;
 import com.enviosya.client.persistence.ClientEntity;
 import com.enviosya.client.tool.Tool;
 import com.google.gson.Gson;
@@ -23,10 +25,10 @@ import javax.ws.rs.core.UriInfo;
  */
 @Path("client")
 public class ClientResource {
-    
+
     @EJB
     private ClientBean clientBean;
-    
+
     @Context
     private UriInfo context;
 
@@ -45,7 +47,7 @@ public class ClientResource {
     @POST
     @Path("add")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response agregar(String body) {
+    public Response agregar(String body) throws DatoErroneoException {
         Gson gson = new Gson();
         ClientEntity u = gson.fromJson(body, ClientEntity.class);
         Tool t = new Tool();
@@ -71,33 +73,34 @@ public class ClientResource {
     @POST
     @Path("update")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response modificar(String body) {
+    public Response modificar(String body)  throws EntidadNoExisteException {
         Gson gson = new Gson();
         ClientEntity u = gson.fromJson(body, ClientEntity.class);
         Response r;
-        ClientEntity modificado = clientBean.modificar(u);
-        if (modificado == null) {
-            r = Response
-                    .status(Response.Status.BAD_REQUEST)
-                    .entity("Client")
-                    .build();
-        } else {
+        ClientEntity modificado = null;
+        try {
+            modificado = clientBean.modificar(u);
             r = Response
                     .status(Response.Status.CREATED)
                     .entity(gson.toJson(modificado))
                     .build();
+        } catch (Exception e) {
+            r = Response
+                    .status(Response.Status.CONFLICT)
+                    .entity("Client")
+                    .build();
         }
         return r;
     }
-     @POST
+    @POST
     @Path("delete")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response eliminar(String body) {
         Gson gson = new Gson();
         ClientEntity u = gson.fromJson(body, ClientEntity.class);
         Response r;
-        Boolean modificado = clientBean.eliminar(u);
-        if (!modificado) {
+        Boolean eliminado = clientBean.eliminar(u);
+        if (!eliminado) {
             r = Response
                     .status(Response.Status.BAD_REQUEST)
                     .entity("Client")
@@ -105,7 +108,7 @@ public class ClientResource {
         } else {
             r = Response
                     .status(Response.Status.CREATED)
-                    .entity(gson.toJson(modificado))
+                    .entity(gson.toJson(eliminado))
                     .build();
         }
         return r;
@@ -123,10 +126,17 @@ public class ClientResource {
     @GET
     @Path("getClient/{id}")
     @Consumes(MediaType.TEXT_HTML)
-    public String getClienteNotificar(@PathParam("id") String id) {
+    public String getClienteNotificar(@PathParam("id") String id)
+            throws EntidadNoExisteException {
         ClientEntity unClient = new ClientEntity();
         unClient.setId(Long.parseLong(id));
-        String retorno = clientBean.obtenerMail(unClient.getId());
-        return retorno;
+        try {
+            String retorno = clientBean.obtenerMail(unClient.getId());
+            return retorno;
+        } catch (Exception e) {
+            throw new EntidadNoExisteException("Error al buscar un cliente. "
+                    + "El cliente con el id: " + id + " no "
+                    + "se encuentra.");
+        }
     }
 }
