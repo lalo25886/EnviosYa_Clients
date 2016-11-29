@@ -111,7 +111,7 @@ public class ClientBean {
     public String obtenerMail(Long id) throws EntidadNoExisteException {
         ClientEntity unClientEntity = null;
         try {
-            em.find(ClientEntity.class, id);
+            unClientEntity = em.find(ClientEntity.class, id);
             String retorno = "";
             if (unClientEntity != null) {
                 retorno = unClientEntity.getEmail();
