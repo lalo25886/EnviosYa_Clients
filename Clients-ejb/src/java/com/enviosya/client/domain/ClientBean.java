@@ -45,7 +45,7 @@ public class ClientBean {
         try {
             em.merge(unClienteEntity);
             em.flush();
-        } catch (Exception e) {
+        } catch (PersistenceException e) {
              log.error("Error al modificar Cliente Entity: " + e.getMessage());
              throw new EntidadNoExisteException("Error al modificar un cliente."
                     + " El cliente con el id: " + unClienteEntity.getId() + " "
@@ -74,50 +74,53 @@ public class ClientBean {
         return list;
     }
 
-    public Client buscar(Long id) throws EntidadNoExisteException {
-        ClientEntity ent;
-        try {
-            ent = em.find(ClientEntity.class, id);
-            Client u = new Client();
-            u.setId(ent.getId());
-            u.setNombre(ent.getNombre());
-            return u;
-        } catch (Exception e) {
-            log.error("Error al buscar Cliente Entity: " + e.getMessage());
-            throw new EntidadNoExisteException("Error al buscar un cliente. "
-                    + "El cliente con el id: " + id + " no "
-                    + "se encuentra.");
-        }
-    }
+//    public Client buscar(Long id) throws EntidadNoExisteException {
+//        ClientEntity ent;
+//        try {
+//            ent = em.find(ClientEntity.class, id);
+//            Client u = new Client();
+//            u.setId(ent.getId());
+//            u.setNombre(ent.getNombre());
+//            return u;
+//        } catch (Exception e) {
+//            log.error("Error al buscar Cliente Entity: " + e.getMessage());
+//            throw new EntidadNoExisteException("Error al buscar un cliente. "
+//                    + "El cliente con el id: " + id + " no "
+//                    + "se encuentra.");
+//        }
+//    }
 
-    public List<ClientEntity> buscar(String nombre)
+    public boolean existeCliente(String ci)
             throws EntidadNoExisteException {
-        List<ClientEntity> listaCliente = null;
+        List<ClientEntity> listaCliente;
+        boolean retorno = false;
         try {
-            em.createQuery("select u from ClientEntity u "
-            + "where u.nombre = :nombre")
-            .setParameter("nombre", nombre).getResultList();
-            return listaCliente;
-        } catch (Exception e) {
-            log.error("Error al buscar Cliente Entity: " + e.getMessage());
-            throw new EntidadNoExisteException("Error al buscar un cliente. "
-                    + "El cliente con el nombre: " + nombre + " no "
-                    + "se encuentra.");
-        }
-    }
+            listaCliente = em.createQuery("SELECT u FROM ClientEntity u "
+            + "WHERE u.ci = :ci")
+            .setParameter("ci", ci).getResultList();
 
-    public List<ClientEntity> listarClientesEnvios()
-            throws EntidadNoExisteException {
-        try {
-        List<ClientEntity> listaClientes = em.createQuery("SELECT u "
-                + "FROM ClientEntity u",
-               ClientEntity.class).getResultList();
-        return listaClientes;
+            if (!listaCliente.isEmpty()) {
+                retorno = true;
+            }
         } catch (PersistenceException e) {
-            log.error("Error al buscar Cliente Entity: " + e.getMessage());
-            throw new EntidadNoExisteException("Error al buscar un cliente.");
+            log.error("Error existeCliente: " + e.getMessage());
+            throw new EntidadNoExisteException("Error en existeCliente");
         }
-   }
+        return retorno;
+    }
+
+//    public List<ClientEntity> listarClientesEnvios()
+//            throws EntidadNoExisteException {
+//        try {
+//        List<ClientEntity> listaClientes = em.createQuery("SELECT u "
+//                + "FROM ClientEntity u",
+//               ClientEntity.class).getResultList();
+//        return listaClientes;
+//        } catch (PersistenceException e) {
+//            log.error("Error al buscar Cliente Entity: " + e.getMessage());
+//            throw new EntidadNoExisteException("Error al buscar un cliente.");
+//        }
+//   }
     public String obtenerMail(Long id) throws EntidadNoExisteException {
         ClientEntity unClientEntity = null;
         try {
