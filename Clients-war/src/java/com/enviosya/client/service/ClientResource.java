@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
+import javax.persistence.PersistenceException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -82,12 +83,18 @@ public class ClientResource {
         Response r;
         ClientEntity modificado;
         try {
+             
             modificado = clientBean.modificar(u);
             r =  Response
                     .status(Response.Status.CREATED)
                     .entity(gson.toJson(modificado))
                     .build();
-        } catch (Exception e) {
+        } catch (PersistenceException e) {
+            r = Response
+                    .status(Response.Status.ACCEPTED)
+                    .entity(ret)
+                    .build();
+        } catch (EntidadNoExisteException ex) {
             r = Response
                     .status(Response.Status.ACCEPTED)
                     .entity(ret)
@@ -126,25 +133,46 @@ public class ClientResource {
     @Path("getClientesEnvios")
     @Consumes(MediaType.APPLICATION_JSON)
     public String  getClientesEnvios() {
-       Gson gson = new Gson();
-       List<ClientEntity> list = clientBean.listarClientesEnvios();
-       return gson.toJson(list);
+        Gson gson = new Gson();
+        String  ret = gson.toJson("Error al obtener un cliente.");
+        Response r;
+        List<ClientEntity> list = null;
+        try {
+            list = clientBean.listarClientesEnvios();
+       } catch (PersistenceException e) {
+            r = Response
+                    .status(Response.Status.ACCEPTED)
+                    .entity(ret)
+                    .build();
+       } catch (EntidadNoExisteException ex) {
+            r = Response
+                    .status(Response.Status.ACCEPTED)
+                    .entity(ret)
+                    .build();
+        }
+        return gson.toJson(list);
     }
 
     @GET
     @Path("getClient/{id}")
     @Consumes(MediaType.TEXT_HTML)
-    public String getClienteNotificar(@PathParam("id") String id)
-            throws EntidadNoExisteException {
+    public String getClienteNotificar(@PathParam("id") String id) {
+        Response r;
+        Gson gson = new Gson();
+        String  ret = gson.toJson("Error al obtener el mail del cliente.");
         ClientEntity unClient = new ClientEntity();
         unClient.setId(Long.parseLong(id));
+        String retorno = "";
         try {
-            String retorno = clientBean.obtenerMail(unClient.getId());
+            retorno = clientBean.obtenerMail(unClient.getId());
             return retorno;
-        } catch (Exception e) {
-            throw new EntidadNoExisteException("Error al buscar un cliente. "
-                    + "El cliente con el id: " + id + " no "
-                    + "se encuentra.");
+        } catch (EntidadNoExisteException ex) {
+            r = Response
+                    .status(Response.Status.ACCEPTED)
+                    .entity(ret)
+                    .build();
         }
+        retorno = "";
+        return retorno;
     }
 }

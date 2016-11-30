@@ -106,11 +106,17 @@ public class ClientBean {
         }
     }
 
-    public List<ClientEntity> listarClientesEnvios() {
+    public List<ClientEntity> listarClientesEnvios()
+            throws EntidadNoExisteException {
+        try {
         List<ClientEntity> listaClientes = em.createQuery("SELECT u "
                 + "FROM ClientEntity u",
                ClientEntity.class).getResultList();
-       return listaClientes;
+        return listaClientes;
+        } catch (PersistenceException e) {
+            log.error("Error al buscar Cliente Entity: " + e.getMessage());
+            throw new EntidadNoExisteException("Error al buscar un cliente.");
+        }
    }
     public String obtenerMail(Long id) throws EntidadNoExisteException {
         ClientEntity unClientEntity = null;
@@ -121,7 +127,7 @@ public class ClientBean {
                 retorno = unClientEntity.getEmail();
             }
             return retorno;
-        } catch (Exception e) {
+        } catch (PersistenceException e) {
             log.error("Error al obtenerMail: " + e.getMessage());
             throw new EntidadNoExisteException("Error al buscar un cliente. "
                     + "El cliente con el id: " + id + " no "
