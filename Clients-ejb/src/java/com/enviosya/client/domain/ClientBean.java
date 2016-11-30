@@ -137,4 +137,23 @@ public class ClientBean {
                     + "se encuentra.");
         }
     }
+
+    public boolean existeCliente(Long idRecibido)
+            throws EntidadNoExisteException {
+        List<ClientEntity> listaCliente;
+        boolean retorno = false;
+        try {
+            listaCliente = em.createQuery("SELECT u FROM ClientEntity u "
+            + "WHERE u.id = :id")
+            .setParameter("id", idRecibido).getResultList();
+
+            if (!listaCliente.isEmpty()) {
+                retorno = true;
+            }
+        } catch (PersistenceException e) {
+            log.error("Error existeCliente: " + e.getMessage());
+            throw new EntidadNoExisteException("Error en existeCliente");
+        }
+        return retorno;
+    }
 }

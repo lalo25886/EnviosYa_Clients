@@ -196,12 +196,39 @@ public class ClientResource {
         Response r;
         Gson gson = new Gson();
         String  ret = gson.toJson("Error al buscar un cadete. "
-                + "El cadete no existe en la base de datos.");
+                + "El cliente no existe en la base de datos.");
         ClientEntity unClient = new ClientEntity();
         unClient.setId(Long.parseLong(id));
         String retorno = "";
         try {
             if (!clientBean.existeCliente(unClient.getCi())) {
+                retorno = "-5";
+            } else {
+                retorno = clientBean.obtenerMail(unClient.getId());
+                return retorno;
+            }
+        } catch (EntidadNoExisteException ex) {
+            r =  Response
+                    .status(Response.Status.ACCEPTED)
+                    .entity(ret)
+                    .build();
+            return "-5";
+        }
+        return retorno;
+    }
+    @GET
+    @Path("isClient/{id}")
+    @Consumes(MediaType.TEXT_HTML)
+    public String esCliente(@PathParam("id") String id) {
+        Response r;
+        Gson gson = new Gson();
+        String  ret = gson.toJson("Error al buscar el cliente. "
+                + "El cliente no existe en la base de datos.");
+        ClientEntity unClient = new ClientEntity();
+        unClient.setId(Long.parseLong(id));
+        String retorno = "";
+        try {
+            if (!clientBean.existeCliente(unClient.getId())) {
                 retorno = "-5";
             } else {
                 retorno = clientBean.obtenerMail(unClient.getId());
