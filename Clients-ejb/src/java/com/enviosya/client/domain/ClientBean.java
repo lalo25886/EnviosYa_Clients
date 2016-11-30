@@ -9,6 +9,7 @@ import javax.ejb.Stateless;
 import javax.ejb.LocalBean;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import org.apache.log4j.Logger;
 
 /**
@@ -31,7 +32,7 @@ public class ClientBean {
         try {
             em.persist(unClientEntity);
             em.flush();
-        } catch (Exception e) {
+        } catch (PersistenceException e) {
             log.error("Error en agregar Cliente Entity: " + e.getMessage());
             throw new DatoErroneoException("Error al agregar un cliente. "
                     + "Verifique los datos ingresados.");
@@ -43,6 +44,7 @@ public class ClientBean {
             throws EntidadNoExisteException {
         try {
             em.merge(unClienteEntity);
+            em.flush();
         } catch (Exception e) {
              log.error("Error al modificar Cliente Entity: " + e.getMessage());
              throw new EntidadNoExisteException("Error al modificar un cliente."
@@ -52,16 +54,18 @@ public class ClientBean {
         return unClienteEntity;
     }
 
-    public boolean eliminar(ClientEntity unClientEntity) {
+    public boolean eliminar(ClientEntity unClientEntity)  
+            throws EntidadNoExisteException {
         try {
             ClientEntity aBorrar =
             em.find(ClientEntity.class, unClientEntity.getId());
             em.remove(aBorrar);
             return true;
-        } catch (Exception e) {
-             log.error("Error en eliminar Cliente Entity: " + e.getMessage());
+        } catch (PersistenceException e) {
+             log.error("Error al eliminar Cliente Entity: " + e.getMessage());
+            throw new EntidadNoExisteException("Error al eliminar un cliente. "
+                    + "Verifique los datos.");
         }
-          return false;
     }
 
     public List<ClientEntity> listar() {
@@ -71,7 +75,7 @@ public class ClientBean {
     }
 
     public Client buscar(Long id) throws EntidadNoExisteException {
-        ClientEntity ent = null;
+        ClientEntity ent;
         try {
             ent = em.find(ClientEntity.class, id);
             Client u = new Client();
