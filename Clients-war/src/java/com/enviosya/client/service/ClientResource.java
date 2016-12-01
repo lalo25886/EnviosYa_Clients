@@ -201,7 +201,7 @@ public class ClientResource {
         unClient.setId(Long.parseLong(id));
         String retorno = "";
         try {
-            if (!clientBean.existeCliente(unClient.getCi())) {
+            if (!clientBean.existeCliente(unClient.getId())) {
                 retorno = "-5";
             } else {
                 retorno = clientBean.obtenerMail(unClient.getId());
