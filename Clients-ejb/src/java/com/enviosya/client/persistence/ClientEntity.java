@@ -32,19 +32,22 @@ public class ClientEntity implements Serializable {
 
    @Column(length = 300)
    private String apellido;
-   
+
    @NotNull
    @Column(length = 300)
    private String email;
-    
+
    @NotNull
    @Column(length = 300)
    private String numeroTarjeta;
-   
+
    @NotNull
    @Column(length = 300)
    private String claveTarjeta;
+   @NotNull
+   private String contrasena;
 
+   private boolean estado;
    public Long getId() {
        return this.id;
    }
@@ -99,8 +102,22 @@ public class ClientEntity implements Serializable {
         this.claveTarjeta = claveTarjeta;
     }
 
-    
-    
+    public String getContrasena() {
+        return contrasena;
+    }
+
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
+    }
+
+    public boolean isEstado() {
+        return estado;
+    }
+
+    public void setEstado(boolean estado) {
+        this.estado = estado;
+    }
+
    @Override
    public int hashCode() {
        int hash = 0;
@@ -130,5 +147,4 @@ public class ClientEntity implements Serializable {
     public String toString() {
         return "Cliente: " + id;
     }
-    
 }

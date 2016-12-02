@@ -4,14 +4,16 @@ import com.enviosya.client.domain.ClientBean;
 import com.enviosya.client.exception.DatoErroneoException;
 import com.enviosya.client.exception.EntidadNoExisteException;
 import com.enviosya.client.persistence.ClientEntity;
+import com.enviosya.client.persistence.TokenEntity;
 import com.enviosya.client.tool.Tool;
 import com.google.gson.Gson;
+import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Map;
 import javax.ejb.EJB;
 import javax.persistence.PersistenceException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -132,6 +134,7 @@ public class ClientResource {
         }
         return r;
     }
+
     @POST
     @Path("delete")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -165,33 +168,10 @@ public class ClientResource {
         return r;
    }
 
-//    @GET
-//    @Path("getClientesEnvios")
-//    @Consumes(MediaType.APPLICATION_JSON)
-//    public String  getClientesEnvios() {
-//        Gson gson = new Gson();
-//        String  ret = gson.toJson("Error al obtener un cliente.");
-//        Response r;
-//        List<ClientEntity> list = null;
-//        try {
-//            list = clientBean.listarClientesEnvios();
-//       } catch (PersistenceException e) {
-//            r = Response
-//                    .status(Response.Status.ACCEPTED)
-//                    .entity(ret)
-//                    .build();
-//       } catch (EntidadNoExisteException ex) {
-//            r = Response
-//                    .status(Response.Status.ACCEPTED)
-//                    .entity(ret)
-//                    .build();
-//        }
-//        return gson.toJson(list);
-//    }
-
     @GET
     @Path("getClient/{id}")
     @Consumes(MediaType.TEXT_HTML)
+
     public String getClienteNotificar(@PathParam("id") String id) {
         Response r;
         Gson gson = new Gson();
@@ -216,6 +196,7 @@ public class ClientResource {
         }
         return retorno;
     }
+
     @GET
     @Path("isClient/{id}")
     @Consumes(MediaType.TEXT_HTML)
@@ -242,5 +223,33 @@ public class ClientResource {
             return "-5";
         }
         return retorno;
+    }
+
+    @POST
+    @Path("logout/{ci}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response cerrarSesion(@PathParam("ci") String ciCliente) throws EntidadNoExisteException {
+        System.out.println("CERRAR SESION " + ciCliente);
+        Gson gson = new Gson();
+        clientBean.cerrarSesion(ciCliente);
+        return Response.ok().entity(gson.toJson("Cerró sesión "
+                + "exitosamente.")).build();
+    }
+
+    @POST
+    @Path("login")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response iniciarSesion(String json) throws EntidadNoExisteException, DatoErroneoException {
+        System.out.println("USUARIO JSON " + json);
+        Gson gson = new Gson();
+        Map<String, Object> map = new HashMap<>();
+        map = (Map<String, Object>) gson.fromJson(json, map.getClass());
+        String contrasena = map.get("contrasena").toString();
+        String usuario = map.get("usuario").toString();
+        System.out.println(contrasena + " y " + usuario);
+        TokenEntity t = clientBean.iniciarSesion(usuario, contrasena, false);
+        return Response.ok().entity(gson.toJson(t)).build();
     }
 }

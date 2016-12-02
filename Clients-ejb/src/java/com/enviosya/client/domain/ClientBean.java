@@ -3,10 +3,14 @@ package com.enviosya.client.domain;
 import com.enviosya.client.exception.DatoErroneoException;
 import com.enviosya.client.exception.EntidadNoExisteException;
 import com.enviosya.client.persistence.ClientEntity;
+import com.enviosya.client.persistence.TokenEntity;
 import java.util.List;
+import java.util.UUID;
 import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.ejb.LocalBean;
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
@@ -24,8 +28,11 @@ public class ClientBean {
     @PersistenceContext
     private EntityManager em;
     @PostConstruct
+
     private void init() {
     }
+    @EJB
+    private TokenBean tokenBean;
 
     public ClientEntity agregar(ClientEntity unClientEntity) 
             throws DatoErroneoException {
@@ -74,22 +81,6 @@ public class ClientBean {
         return list;
     }
 
-//    public Client buscar(Long id) throws EntidadNoExisteException {
-//        ClientEntity ent;
-//        try {
-//            ent = em.find(ClientEntity.class, id);
-//            Client u = new Client();
-//            u.setId(ent.getId());
-//            u.setNombre(ent.getNombre());
-//            return u;
-//        } catch (Exception e) {
-//            log.error("Error al buscar Cliente Entity: " + e.getMessage());
-//            throw new EntidadNoExisteException("Error al buscar un cliente. "
-//                    + "El cliente con el id: " + id + " no "
-//                    + "se encuentra.");
-//        }
-//    }
-
     public boolean existeCliente(String ci)
             throws EntidadNoExisteException {
         List<ClientEntity> listaCliente;
@@ -109,18 +100,6 @@ public class ClientBean {
         return retorno;
     }
 
-//    public List<ClientEntity> listarClientesEnvios()
-//            throws EntidadNoExisteException {
-//        try {
-//        List<ClientEntity> listaClientes = em.createQuery("SELECT u "
-//                + "FROM ClientEntity u",
-//               ClientEntity.class).getResultList();
-//        return listaClientes;
-//        } catch (PersistenceException e) {
-//            log.error("Error al buscar Cliente Entity: " + e.getMessage());
-//            throw new EntidadNoExisteException("Error al buscar un cliente.");
-//        }
-//   }
     public String obtenerMail(Long id) throws EntidadNoExisteException {
         ClientEntity unClientEntity = null;
         try {
@@ -156,4 +135,89 @@ public class ClientBean {
         }
         return retorno;
     }
+    public void cerrarSesion(String ci) throws EntidadNoExisteException {
+        try {
+            ClientEntity cliente = this.obtenerClientePorCi(ci);
+            TokenEntity n = new TokenEntity();
+            TokenEntity t = tokenBean.obtenerTokenPorUsuario(cliente.getId());
+            tokenBean.borrarToken(t);
+        } catch (Exception e) {
+            throw new EntidadNoExisteException(e.getMessage());
+        }
+    }
+    private ClientEntity obtenerClientePorCi(String ci)
+            throws EntidadNoExisteException {
+        try {
+            ClientEntity retorno = null;
+            List<ClientEntity> lista = null;
+            lista = em.createQuery("SELECT u FROM ClientEntity u "
+                    + "WHERE u.ci = :ci")
+                    .setParameter("ci", ci)
+                    .setMaxResults(1)
+                    .getResultList();
+            for (int i = 0; i<= lista.size(); i++) {
+                if(lista.get(i) != null){
+                    retorno = lista.get(i);
+                    i = lista.size() +1;
+                }
+            }
+            return retorno;
+        } catch (Exception e) {
+            throw new EntidadNoExisteException("Entidad no existe");
+        }
+    }
+
+    public boolean estaLogueado(ClientEntity usuario) throws EntidadNoExisteException {
+        if (tokenBean.obtenerTokenPorUsuario(usuario.getId()) != null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    public TokenEntity iniciarSesion(String ci, String pass, boolean modoEdit)
+            throws EntidadNoExisteException, DatoErroneoException {
+        String token = "";
+        System.out.println(ci + " y " + pass);
+        TokenEntity t = null;
+        try {
+            ClientEntity cliente = obtenerClientePorCi(ci);
+            if(cliente == null){
+                throw new EntidadNoExisteException("El cliente con ci "
+                    + "" + ci + " no fue encontrado.");
+            }
+            if (modoEdit) {
+                if (!estaLogueado(cliente)) {
+                    t = crearToken(cliente, pass);
+                    return t;
+                }
+            } else {
+                t = crearToken(cliente, pass);
+                return t;
+            }
+        } catch (EntityExistsException e) {
+            throw new EntidadNoExisteException("El cliente con ci "
+                    + "" + ci + " no fue encontrado.");
+        } catch (Exception e) {
+            throw e;
+        }
+        return t;
+    }
+
+    private TokenEntity crearToken(ClientEntity cli, String pass)
+            throws DatoErroneoException {
+        String token = " ";
+        if (cli.getContrasena().equals(pass)) {
+            token = UUID.randomUUID().toString();
+            TokenEntity t = new TokenEntity();
+            t.setToken(token);
+            t.setUsuario(cli);
+            tokenBean.registarToken(t);
+            return t;
+        } else {
+            throw new DatoErroneoException("Las contraseñas no coinciden.");
+        }
+    }
+
 }

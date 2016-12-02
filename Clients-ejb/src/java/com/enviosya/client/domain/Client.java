@@ -1,17 +1,21 @@
 package com.enviosya.client.domain;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Gonzalo
  */
 public class Client {
     private Long id;
-    private Long ci;
+    private String ci;
     private String nombre;
     private String apellido;
     private String email;
     private String numeroTarjeta;
     private String claveTarjeta;
+    private boolean estado;
+    private String contrasena;
 
     public Long getId() {
         return id;
@@ -21,11 +25,11 @@ public class Client {
         this.id = id;
     }
 
-    public long getCi() {
+    public String getCi() {
         return ci;
     }
 
-    public void setCi(long ci) {
+    public void setCi(String ci) {
         this.ci = ci;
     }
 
@@ -68,7 +72,13 @@ public class Client {
     public void setClaveTarjeta(String claveTarjeta) {
         this.claveTarjeta = claveTarjeta;
     }
+    public String getContrasena() {
+        return contrasena;
+    }
 
+    public void setContrasena(String cont) {
+        this.contrasena = cont;
+    }
     @Override
     public String toString() {
         return "ID = " + id + ", "
