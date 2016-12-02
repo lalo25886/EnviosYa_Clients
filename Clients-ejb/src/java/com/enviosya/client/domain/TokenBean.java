@@ -7,6 +7,7 @@ package com.enviosya.client.domain;
 
 import com.enviosya.client.exception.EntidadNoExisteException;
 import com.enviosya.client.persistence.TokenEntity;
+import java.util.List;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -39,11 +40,20 @@ public class TokenBean {
         }
     }
 
-    public TokenEntity obtenerTokenPorUsuario(Long id) throws EntidadNoExisteException {
-        System.out.println("idddddddddd" + id);
-        return (TokenEntity) em.createQuery("select t from TokenEntity t "
+    public TokenEntity obtenerTokenPorUsuario(Long id)
+            throws EntidadNoExisteException {
+        TokenEntity retorno = null;
+        List<TokenEntity> lista = null;
+        lista = em.createQuery("select t from TokenEntity t "
                 + "where t.usuario.id=:id")
-                .setParameter("id", id).getSingleResult();
+                .setParameter("id", id).getResultList();
+        for (int i = 0; i<= lista.size(); i++) {
+                if(lista.get(i) != null){
+                    retorno = lista.get(i);
+                    i = lista.size() +1;
+                }
+        }
+        return retorno;
     }
 }
 

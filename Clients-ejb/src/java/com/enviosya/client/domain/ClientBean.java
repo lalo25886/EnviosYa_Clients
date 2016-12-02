@@ -168,7 +168,9 @@ public class ClientBean {
     }
 
     public boolean estaLogueado(ClientEntity usuario) throws EntidadNoExisteException {
-        if (tokenBean.obtenerTokenPorUsuario(usuario.getId()) != null) {
+        TokenEntity t = tokenBean.obtenerTokenPorUsuario(usuario.getId());
+        System.out.println("DESPUES DE OBTENER " + t);
+        if (t != null) {
             return true;
         } else {
             return false;

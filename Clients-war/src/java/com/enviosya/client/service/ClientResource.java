@@ -40,7 +40,7 @@ public class ClientResource {
     public ClientResource() {
     }
 
-     @GET
+    @GET
     @Path("getJson")
     @Produces(MediaType.APPLICATION_JSON)
     public String getJson() {
@@ -229,7 +229,8 @@ public class ClientResource {
     @Path("logout/{ci}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response cerrarSesion(@PathParam("ci") String ciCliente) throws EntidadNoExisteException {
+    public Response cerrarSesion(@PathParam("ci") String ciCliente)
+            throws EntidadNoExisteException {
         System.out.println("CERRAR SESION " + ciCliente);
         Gson gson = new Gson();
         clientBean.cerrarSesion(ciCliente);
@@ -241,7 +242,8 @@ public class ClientResource {
     @Path("login")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response iniciarSesion(String json) throws EntidadNoExisteException, DatoErroneoException {
+    public Response iniciarSesion(String json)
+            throws EntidadNoExisteException, DatoErroneoException {
         System.out.println("USUARIO JSON " + json);
         Gson gson = new Gson();
         Map<String, Object> map = new HashMap<>();
@@ -251,5 +253,21 @@ public class ClientResource {
         System.out.println(contrasena + " y " + usuario);
         TokenEntity t = clientBean.iniciarSesion(usuario, contrasena, false);
         return Response.ok().entity(gson.toJson(t)).build();
+    }
+    @POST
+    @Path("islogin/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response estaLogueado(@PathParam("id") String id)
+            throws EntidadNoExisteException {
+        Gson gson = new Gson();
+        ClientEntity unClient = new ClientEntity();
+        unClient.setId(Long.parseLong(id));
+        System.out.println("DADDSADASD: " + unClient.getId());
+        boolean esta = clientBean.estaLogueado(unClient);
+        if (esta){
+            return Response.ok().entity(gson.toJson("1")).build();
+        }
+        return Response.ok().entity(gson.toJson("0")).build();
     }
 }
